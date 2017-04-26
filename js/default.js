@@ -22,43 +22,48 @@ jQuery(document).ready(function(){
     }
   });
 
-  var orderTypeRowTotal = function(orderTypeRow){
-    var orderTypeRow = jQuery('.order-type-row');
-    var orderSubTotal = 0.00;
-    var orderTotal = 0.00;
-    var orderDelivery = parseFloat(jQuery('.order-frete-value').val().replace(',', '.'));
-    orderTypeRow.each(function(i, e){
-      var orderTypeValue = jQuery(e).find('.input-order-type-value').val().replace(',','.');
-      var orderTypeAmount = jQuery(e).find('.input-order-type-amount').val();
-      orderSubTotal = orderTypeValue * orderTypeAmount;
-      orderTotal = orderTotal + orderSubTotal;
-      jQuery(e).find('.input-order-type-total').val(orderSubTotal.toFixed(2).toString().replace('.',',')).mask("#.##0,00", {reverse: true});
+  // multiply every amount per unit price and update total
+  // sum every amount, sum every total and update footer
+  var orderTypeRowTotal = function(){
+    jQuery('.table-order-type tr').each(function(i,e){
+      var amount = parseInt(jQuery(e).find('.input-order-type-amount').val());
+      var unitPrice = parseFloat(jQuery(e).find('.input-order-type-value').val().replace(',','.'));
+      var totalPrice = amount * unitPrice;
+      jQuery(e).find('.input-order-type-total').val(totalPrice.toFixed(2).toString().replace('.',','));
     });
-    orderTotal = orderTotal + orderDelivery;
-    jQuery('.input-order-total').val(orderTotal.toFixed(2).toString().replace('.',',')).mask("#.##0,00", {reverse: true});
-    orderTypeRow = null;
-  }
+    var totalAmount = 0;
+    jQuery('.input-order-type-amount').each(function(inputIndex,inputElement){
+      totalAmount = totalAmount + parseInt(jQuery(inputElement).val());
+    });
+    jQuery('.order-type-total-amount').html(totalAmount);
+    var totalPrice  = 0.00;
+    jQuery('.input-order-type-total').each(function(inputIndex,inputElement){
+      totalPrice = totalPrice + parseFloat(jQuery(inputElement).val().replace(',','.'));
+    });
+    jQuery('.input-order-total').val(totalPrice.toFixed(2).toString().replace('.',','));
+  };
 
-  jQuery(document).on('blur', '.input-order-type-amount', orderTypeRowTotal);
-  jQuery(document).on('blur', '.input-order-type-value', orderTypeRowTotal);
-  jQuery(document).on('blur', '.order-frete-value', orderTypeRowTotal);
+  jQuery(document).on('focusout', '.input-order-type-amount', orderTypeRowTotal);
+  jQuery(document).on('focusout', '.input-order-type-value', orderTypeRowTotal);
+  jQuery(document).on('focusout', '.order-frete-value', orderTypeRowTotal);
 
-  jQuery('.btn-add-order-type').on('click', function(){
-    var newRow = jQuery('#order-type-container .order-type-row').first().clone();
-    newRow.appendTo('#order-type-container').
-      find('.btn-add-order-type').removeClass('btn-success btn-add-order-type').addClass('btn-warning btn-remove-order-type').
-      find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
-    var inputField = newRow.find('input');
-    jQuery(inputField).each(function(element){
-      jQuery(this).attr('name', jQuery(this).attr('name') + '-' + i);
-    });
-    var selectField = newRow.find('select');
-    jQuery(selectField).each(function(element){
-      jQuery(this).attr('name', jQuery(this).attr('name') + '-' + i);
-    });
-    i++;
+  // add new table row
+  jQuery('.btn-add-order-type').live('click', function(){
+    var tableBody = jQuery(this).parent().parent();
+    var newRow = tableBody.first().clone();
+    newRow.find('.btn-add-order-type').removeClass('btn-sucess btn-add-order-type').
+      addClass('btn-warning btn-remove-order-type').find('.glyphicon').removeClass('glyphicon-plus').
+      addClass('glyphicon-minus');
+    newRow.find('.select-order-type').val('');
+    newRow.find('.select-order-type-color').val('');
+    newRow.find('.input-order-type-amount').val(1);
+    newRow.find('.input-order-type-value').val('0,00');
+    newRow.find('.input-order-type-total').val('0,00');
+    newRow.appendTo(tableBody.parent());
+    orderTypeRowTotal();
   });
 
+  // remove table row
   jQuery('.btn-remove-order-type').live('click', function(){
     jQuery(this).parent().parent().remove();
     orderTypeRowTotal();
