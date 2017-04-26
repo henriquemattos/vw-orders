@@ -121,7 +121,7 @@
               </select>
             </td>
             <td>
-              <input type="number" class="form-control input-order-type-amount" min="1" max="9999" name="order-type-amount[]" value="1">
+              <input type="number" name="order-type-amount[]" class="form-control input-order-type-amount" min="1" max="9999" value="1">
             </td>
             <td>
               <div class="input-group">
@@ -236,7 +236,7 @@
     <div class="form-group">
       <label for="order-payment-notes" class="col-sm-2 control-label">Observações:</label>
       <div class="col-sm-5">
-        <textarea class="form-control" name="order-payment-notes" rows="3"></textarea>
+        <textarea class="form-control" name="order-payment-notes" rows="3">WhatsApp (21) 9703­9-9948 ­ www.querocopo.com.br</textarea>
       </div>
     </div>
     <div class="form-group">

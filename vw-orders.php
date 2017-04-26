@@ -139,6 +139,8 @@ class VW_Orders {
       $param = explode('=', $chunk);
       $finalArr[$param[0]] = $param[1];
     }
+    print_r($finalArr);
+    wp_die();
     $table_name = $wpdb->prefix . 'vworders';
     $orderDate = explode('/', $finalArr['order-date']);
     $dataArr = array(
