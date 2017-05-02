@@ -74,7 +74,7 @@ jQuery(document).ready(function(){
     var data = {
       'action': 'save',
       'nonce': ajax_object.nonce,
-      'data': jQuery(this).serialize()
+      'data': jQuery(this).serializeJSON()
     };
     jQuery.ajax({
       url: ajax_object.ajax_url,
@@ -82,7 +82,7 @@ jQuery(document).ready(function(){
       cache: false,
       context: document.body,
       dataType: 'json',
-      method: 'POST',
+      type: 'POST',
       beforeSend: function(jqXHR, settings){
         jQuery('.alert-dismissible').alert('close');
       },

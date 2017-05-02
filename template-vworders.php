@@ -1,58 +1,58 @@
 <div class="container-fluid">
   <h1 class="text-info">Pedidos</h1>
-  <form class="form-horizontal">
+  <form class="form-horizontal" name="save-order" enctype="application/x-www-form-urlencoded" method="post">
     <div class="form-group">
       <label for="order-number" class="col-sm-2 control-label">Número de Venda:</label>
       <div class="col-sm-3">
-        <input type="number" class="form-control" id="order-number" name="order-number" value="1" min="000000001" max="999999999">
+        <input type="number" name="order-number" class="form-control" id="order-number" value="1" min="000000001" max="999999999">
       </div>
     </div>
     <div class="form-group">
       <label for="order-date" class="col-sm-2 control-label">Data:</label>
       <div class="col-sm-2">
-        <input type="date" class="form-control input-date" id="order-date" name="order-date" value="<?php echo date('d/m/Y'); ?>">
+        <input type="date" name="order-date" class="form-control input-date" id="order-date" value="<?php echo date('d/m/Y'); ?>">
       </div>
     </div>
     <div class="form-group">
       <label for="order-client" class="col-sm-2 control-label">Cliente:</label>
       <div class="col-sm-4">
-        <input type="text" class="form-control" id="order-client" name="order-client" placeholder="Cliente">
+        <input type="text" name="order-client" class="form-control" id="order-client" placeholder="Cliente">
       </div>
     </div>
     <div class="form-group">
       <label for="order-cpf-cnpj" class="col-sm-2 control-label">CPF/CNPJ:</label>
       <div class="col-sm-2">
-        <input type="text" class="form-control" id="order-cpf-cnpj" name="order-cpf-cnpj">
+        <input type="text" name="order-cpf-cnpj" class="form-control" id="order-cpf-cnpj">
       </div>
     </div>
     <div class="form-group">
       <label for="order-zip" class="col-sm-2 control-label">CEP:</label>
       <div class="col-sm-2">
-        <input type="text" class="form-control" id="order-zip" name="order-zip" maxlength="9" placeholder="22000-222">
+        <input type="text" name="order-zip" class="form-control" id="order-zip" maxlength="9" placeholder="22000-222">
       </div>
     </div>
     <div class="form-group">
       <label for="order-address" class="col-sm-2 control-label">Endereço Completo:</label>
       <div class="col-sm-6">
-        <input type="text" class="form-control" id="order-address" name="order-address" placeholder="Av. Paranapuã, 262, A, Ilha do Governador, Rio de Janeiro - RJ">
+        <input type="text" name="order-address" class="form-control" id="order-address" placeholder="Av. Paranapuã, 262, A, Ilha do Governador, Rio de Janeiro - RJ">
       </div>
     </div>
     <div class="form-group">
       <label for="order-email" class="col-sm-2 control-label">E-mail:</label>
       <div class="col-sm-4">
-        <input type="email" class="form-control" id="order-email" name="order-email" placeholder="email@dominio.com.br">
+        <input type="email" name="order-email" class="form-control" id="order-email" placeholder="email@dominio.com.br">
       </div>
     </div>
     <div class="form-group">
       <label for="order-phone" class="col-sm-2 control-label">Telefone:</label>
       <div class="col-sm-2">
-        <input type="text" class="form-control" id="order-phone" name="order-phone" placeholder="(21) 2200-0022">
+        <input type="text" name="order-phone" class="form-control" id="order-phone" placeholder="(21) 2200-0022">
       </div>
     </div>
     <div class="form-group">
       <label for="order-mobile" class="col-sm-2 control-label">Celular:</label>
       <div class="col-sm-2">
-        <input type="text" class="form-control" id="order-mobile" name="order-mobile" placeholder="(21) 98800-0088">
+        <input type="text" name="order-mobile" class="form-control" id="order-mobile" placeholder="(21) 98800-0088">
       </div>
     </div>
     <div class="table-responsive">
@@ -77,7 +77,7 @@
                 <span class="input-group-addon">
                   R$
                 </span>
-                <input type="text" class="form-control input-currency input-order-total" name="order-total" value="0,00">
+                <input type="text" name="order-total" class="form-control input-currency input-order-total" value="0,00">
               </div>
             </td>
           </tr>
@@ -85,7 +85,7 @@
         <tbody class="table-order-type">
           <tr>
             <td>
-              <select name="order-type[]" class="form-control select-order-type">
+              <select name="order-type[][item]" class="form-control select-order-type">
                 <option value="">Escolha um item</option>
                 <optgroup label="Modelos de Copos">
                   <option value="Caldereta">Caldereta</option>
@@ -101,7 +101,7 @@
               </select>
             </td>
             <td>
-              <select name="order-type-color[]" class="form-control select-order-type-color">
+              <select name="order-type[][color]" class="form-control select-order-type-color">
                   <option value="">Escolha uma cor</option>
                   <option value="Amarelo Neon">Amarelo Neon</option>
                   <option value="Rosa Neon">Rosa Neon</option>
@@ -121,14 +121,14 @@
               </select>
             </td>
             <td>
-              <input type="number" name="order-type-amount[]" class="form-control input-order-type-amount" min="1" max="9999" value="1">
+              <input type="number" name="order-type[][amount]" class="form-control input-order-type-amount" min="1" max="9999" value="1">
             </td>
             <td>
               <div class="input-group">
                 <span class="input-group-addon">
                   R$
                 </span>
-                <input type="text" name="order-type-value[]" class="form-control input-currency input-order-type-value" value="0,00" data-toggle="tooltip" data-placement="top" title="Valor unitário">
+                <input type="text" name="order-type[][value]" class="form-control input-currency input-order-type-value" value="0,00" data-toggle="tooltip" data-placement="top" title="Valor unitário">
               </div>
             </td>
             <td>
@@ -136,7 +136,7 @@
                 <span class="input-group-addon">
                   R$
                 </span>
-                <input type="text" name="order-type-total[]" class="form-control input-currency input-order-type-total" value="0,00" data-toggle="tooltip" data-placement="top" title="Valor total" readonly>
+                <input type="text" name="order-type[][total]" class="form-control input-currency input-order-type-total" value="0,00" data-toggle="tooltip" data-placement="top" title="Valor total" readonly>
               </div>
             </td>
             <td>
@@ -164,46 +164,46 @@
         <tbody>
           <tr>
             <td>
-              <input type="number" class="form-control" min="1" max="9999" name="order-days-payment" value="1">
+              <input type="number" name="order-payment[][days]" class="form-control" min="1" max="9999" value="1">
             </td>
             <td>
-              <input type="date" class="form-control input-date" id="order-date-payment" name="order-date-payment" value="<?php echo date('d/m/Y',  time() + (86400 * 3)); ?>">
+              <input type="date" name="order-payment[][date]" class="form-control input-date" id="order-date-payment" value="<?php echo date('d/m/Y',  time() + (86400 * 3)); ?>">
             </td>
             <td>
-              <input type="text" class="form-control" name="order-payment-method">
+              <input type="text" name="order-payment[][method]" class="form-control">
             </td>
             <td>
               <div class="input-group">
                 <span class="input-group-addon">
                   R$
                 </span>
-                <input type="text" name="order-payment-value" class="form-control input-currency" value="0,00">
+                <input type="text" name="order-payment[][value]" class="form-control input-currency" value="0,00">
               </div>
             </td>
             <td>
-              <textarea class="form-control" name="order-payment-notes" rows="2"></textarea>
+              <textarea class="form-control" name="order-payment[][notes]" rows="2"></textarea>
             </td>
           </tr>
             <tr>
               <td>
-                <input type="number" class="form-control" min="1" max="9999" name="order-days-payment" value="1">
+                <input type="number" name="order-payment[][days]" class="form-control" min="1" max="9999" value="1">
               </td>
               <td>
-                <input type="date" class="form-control input-date" id="order-date-payment" name="order-date-payment" value="<?php echo date('d/m/Y',  time() + (86400 * 3)); ?>">
+                <input type="date" name="order-payment[][date]" class="form-control input-date" id="order-date-payment" value="<?php echo date('d/m/Y',  time() + (86400 * 3)); ?>">
               </td>
               <td>
-                <input type="text" class="form-control" name="order-payment-method">
+                <input type="text" name="order-payment[][method]" class="form-control">
               </td>
               <td>
                 <div class="input-group">
                   <span class="input-group-addon">
                     R$
                   </span>
-                  <input type="text" name="order-payment-value" class="form-control input-currency" value="0,00">
+                  <input type="text" name="order-payment[][value]" class="form-control input-currency" value="0,00">
                 </div>
               </td>
               <td>
-                <textarea class="form-control" name="order-payment-notes" rows="2"></textarea>
+                <textarea class="form-control" name="order-payment[][notes]" rows="2"></textarea>
               </td>
             </tr>
         </tbody>

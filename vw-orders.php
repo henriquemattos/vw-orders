@@ -116,7 +116,8 @@ class VW_Orders {
     wp_enqueue_style('vworders-default');
     wp_enqueue_script('bootstrap', plugin_dir_url( __FILE__ ) . 'js/bootstrap.min.js', array('jquery'), '1.0.0', true);
     wp_enqueue_script('jquery-mask', plugin_dir_url( __FILE__ ) . 'js/jquery.mask.min.js', array('jquery', 'bootstrap'), '1.0.0', true);
-    wp_enqueue_script('vw_orders', plugin_dir_url( __FILE__ ) . 'js/default.js', array('jquery', 'bootstrap', 'jquery-mask'), '1.0.0', true);
+    wp_enqueue_script('jquery-serialize', plugin_dir_url(__FILE__) . 'js/jquery.serializejson.min.js', array('jquery'), '1.0.0', true);
+    wp_enqueue_script('vw_orders', plugin_dir_url( __FILE__ ) . 'js/default.js', array('jquery', 'bootstrap', 'jquery-mask', 'jquery-serialize'), '1.0.0', true);
     wp_localize_script('vw_orders', 'ajax_object', array('ajax_url' => admin_url('admin-ajax.php'),'nonce' => wp_create_nonce('vworders_save_nonce')));
   }
 
@@ -133,36 +134,28 @@ class VW_Orders {
       wp_die();
     }
 
-    $data = explode('&', urldecode($_POST['data']));
-    $finalArr = array();
-    foreach($data as $chunk){
-      $param = explode('=', $chunk);
-      $finalArr[$param[0]] = $param[1];
-    }
-    print_r($finalArr);
-    wp_die();
     $table_name = $wpdb->prefix . 'vworders';
-    $orderDate = explode('/', $finalArr['order-date']);
+    $orderDate = explode('/', $data['order-date']);
     $dataArr = array(
-      'vworders_order'          => $finalArr['order-number'],
+      'vworders_order'          => $data['order-number'],
       'vworders_date'           => $orderDate[2] . '-' . $orderDate[1] . '-' . $orderDate[0],
-      'vworders_client'         => $finalArr['order-client'],
-      'vworders_cpf_cnpj'       => $finalArr['order-cpf-cnpj'],
-      'vworders_zip'            => $finalArr['order-zip'],
-      'vworders_address'        => $finalArr['order-address'],
-      'vworders_email'          => $finalArr['order-email'],
-      'vworders_phone'          => $finalArr['order-phone'],
-      'vworders_mobile'         => $finalArr['order-mobile'],
-      'vworders_print_color'    => $finalArr['order-print-color'],
-      'vworders_delivery_date'  => $finalArr['order-date-delivery'],
-      'vworders_extras_costs'   => $finalArr[''],
-      'vworders_delivery_price' => $finalArr['order-frete-value'],
-      'vworders_total'          => $finalArr['order-total'],
-      'vworders_payment_days'   => $finalArr['order-days-payment'],
+      'vworders_client'         => $data['order-client'],
+      'vworders_cpf_cnpj'       => $data['order-cpf-cnpj'],
+      'vworders_zip'            => $data['order-zip'],
+      'vworders_address'        => $data['order-address'],
+      'vworders_email'          => $data['order-email'],
+      'vworders_phone'          => $data['order-phone'],
+      'vworders_mobile'         => $data['order-mobile'],
+      'vworders_print_color'    => $data['order-print-color'],
+      'vworders_delivery_date'  => $data['order-date-delivery'],
+      'vworders_extras_costs'   => $data[''],
+      'vworders_delivery_price' => $data['order-frete-value'],
+      'vworders_total'          => $data['order-total'],
+      'vworders_payment_days'   => $data['order-days-payment'],
       ## order-date-payment
-      'vworders_payment_method' => $finalArr['order-payment-method'],
-      'vworders_payment_value'  => $finalArr['order-payment-value'],
-      'vworders_obs'            => $finalArr['order-payment-notes']
+      'vworders_payment_method' => $data['order-payment-method'],
+      'vworders_payment_value'  => $data['order-payment-value'],
+      'vworders_obs'            => $data['order-payment-notes']
     );
     $wpdb->insert($table_name, $dataArr);
 
