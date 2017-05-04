@@ -1,7 +1,7 @@
 <div class="container-fluid">
   <h1 class="text-info">Listar Pedidos</h1>
   <div class="text-left">
-    <a href="/wp-admin/admin.php?page=vw-orders-create" class="btn btn-success">Adicionar novo pedido</a>
+    <a href="<?php menu_page_url('vw-orders-create'); ?>" class="btn btn-success">Adicionar novo pedido</a>
   </div>
   <br />
   <?php // $results is the get_results query object ?>
