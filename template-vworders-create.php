@@ -1,5 +1,5 @@
 <div class="container-fluid">
-  <h1 class="text-info">Pedidos</h1>
+  <h1 class="text-info">Adicionar Pedidos</h1>
   <div id="alert"></div>
   <form class="form-horizontal" name="save-order" enctype="application/x-www-form-urlencoded" method="post">
     <div class="form-group">

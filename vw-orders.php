@@ -110,9 +110,10 @@ class VW_Orders {
   }
 
   public function vworders_admin_menu(){
-    add_menu_page( 'Todos os Pedidos','Pedidos','publish_posts','vw-orders.php', array($this, 'vworders_create'), 'dashicons-analytics' );
-    add_submenu_page( 'vw-orders.php', 'Adicionar Pedido', 'Adicionar Pedido', 'publish_posts', 'vw-orders-report.php', array($this, 'vworders_create') );
-    add_submenu_page( 'vw-orders.php', 'Gerar Relatórios', 'Gerar Relatórios', 'publish_posts', 'vw-orders-report.php', array($this, 'vworders_report') );
+    add_menu_page('Pedidos', 'Pedidos','publish_posts','vw-orders.php', array($this, 'vworders_list'), 'dashicons-analytics' );
+    add_submenu_page('vw-orders.php', 'Todos os Pedidos', 'Todos os Pedidos', 'publish_posts', 'vw-orders.php', array($this, 'vworders_list') );
+    add_submenu_page('vw-orders.php', 'Adicionar Pedido', 'Adicionar Pedido', 'publish_posts', 'vw-orders-create', array($this, 'vworders_create') );
+    add_submenu_page('vw-orders.php', 'Gerar Relatórios', 'Gerar Relatórios', 'publish_posts', 'vw-orders-reporst', array($this, 'vworders_report') );
   }
 
   public function vworders_init(){
@@ -129,8 +130,18 @@ class VW_Orders {
     wp_localize_script('vw_orders', 'ajax_object', array('ajax_url' => admin_url('admin-ajax.php'),'nonce' => wp_create_nonce('vworders_save_nonce')));
   }
 
+  public function vworders_list(){
+    global $wpdb;
+    $table_data = $wpdb->prefix . 'vworders';
+    $table_type = $wpdb->prefix . 'vworders_item';
+    $table_payments = $wpdb->prefix . 'vworders_payment';
+    $query = "SELECT * FROM {$table_data} ORDER BY order_date DESC";
+    $results = $wpdb->get_results($query, OBJECT);
+    include_once 'template-vworders-list.php';
+  }
+
   public function vworders_create(){
-    include_once 'template-vworders.php';
+    include_once 'template-vworders-create.php';
   }
 
   public function save(){
