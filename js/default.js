@@ -91,6 +91,7 @@ jQuery(document).ready(function(){
         jQuery('#alert').prepend(jQuery(alert).append(msg).addClass('alert-success').alert());
       },
       complete: function(jqXHR, textStatus){
+        window.scrollTo(0, 0);
       },
       error: function(jqXHR, textStatus, errorThrown){
         var msg = '<p>' + textStatus + ': ' + errorThrown + '</p>';

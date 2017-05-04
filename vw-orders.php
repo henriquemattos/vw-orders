@@ -31,50 +31,58 @@ class VW_Orders {
   public function vworders_install(){
     global $wpdb;
     $tableOrders = $wpdb->prefix . 'vworders';
+    $tablePayments = $wpdb->prefix . 'vworders_payment';
+    $tableItems = $wpdb->prefix . 'vworders_item';
     $charset_collate = $wpdb->get_charset_collate();
 
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
     $sql = "CREATE TABLE IF NOT EXISTS $tableOrders (
-      vworders_id INT NOT NULL AUTO_INCREMENT,
-      vworders_order VARCHAR(45) NULL,
-      vworders_date DATE NULL,
-      vworders_client VARCHAR(255) NULL,
-      vworders_cpf_cnpj VARCHAR(45) NULL,
-      vworders_zip VARCHAR(45) NULL,
-      vworders_address VARCHAR(255) NULL,
-      vworders_email VARCHAR(255) NULL,
-      vworders_phone VARCHAR(45) NULL,
-      vworders_mobile VARCHAR(45) NULL,
-      vworders_print_color VARCHAR(45) NULL,
-      vworders_delivery_date VARCHAR(45) NULL,
-      vworders_extras_costs VARCHAR(45) NULL,
-      vworders_delivery_price VARCHAR(45) NULL,
-      vworders_total VARCHAR(45) NULL,
-      vworders_payment_days VARCHAR(45) NULL,
-      vworders_payment_method VARCHAR(45) NULL,
-      vworders_payment_value VARCHAR(45) NULL,
-      vworders_obs VARCHAR(45) NULL,
-      PRIMARY KEY (vworders_id),
-      UNIQUE INDEX id_UNIQUE (vworders_id ASC))
-     $charset_collate;";
-	    dbDelta($sql);
+         id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+         order_number VARCHAR(45) NULL,
+         order_date DATE NULL DEFAULT NULL,
+         order_client VARCHAR(255) NULL,
+         order_cpf_cnpj VARCHAR(45) NULL,
+         order_zip VARCHAR(45) NULL,
+         order_address VARCHAR(255) NULL,
+         order_email VARCHAR(255) NULL,
+         order_phone VARCHAR(45) NULL,
+         order_mobile VARCHAR(45) NULL,
+         order_total VARCHAR(45) NULL,
+         order_print_color VARCHAR(45) NULL,
+         order_date_delivery DATE NULL DEFAULT NULL,
+         order_delivery_name VARCHAR(45) NULL,
+         order_delivery_type VARCHAR(45) NULL,
+         order_payment_notes VARCHAR(45) NULL,
+         PRIMARY KEY (id))
+       $charset_collate;";
+    dbDelta($sql);
 
-      // create order products
-      $tableProducts = $wpdb->prefix . 'vworders_products';
-      $sqlProducts = "CREATE TABLE IF NOT EXISTS $tableProducts (
-        vworders_product_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-        vworders_product_color VARCHAR(45) NULL,
-        vworders_product_amount VARCHAR(45) NULL,
-        vworders_product_unit VARCHAR(45) NULL,
-        vworders_product_total VARCHAR(45) NULL,
-        vworders_products_type VARCHAR(45) NULL,
-        vworders_vworders_id INT NOT NULL,
-        PRIMARY KEY (vworders_product_id, vworders_vworders_id),
-        UNIQUE INDEX vworders_product_id_UNIQUE (vworders_product_id ASC))
-         $charset_collate;";
-    	    dbDelta($sqlProducts);
-      add_option('vworders_db_version', $this->vworders_db_version);
+    $sql = "CREATE TABLE IF NOT EXISTS $tablePayments (
+        id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+        vworders_id INT UNSIGNED NOT NULL,
+        days VARCHAR(45) NULL,
+        date VARCHAR(45) NULL,
+        method VARCHAR(45) NULL,
+        value VARCHAR(45) NULL,
+        notes VARCHAR(45) NULL,
+        PRIMARY KEY (id, vworders_id))
+      $charset_collate;";
+    dbDelta($sql);
+
+    $sql = "CREATE TABLE IF NOT EXISTS $tableItems (
+      id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      vworders_id INT UNSIGNED NOT NULL,
+      item VARCHAR(45) NULL,
+      color VARCHAR(45) NULL,
+      amount VARCHAR(45) NULL,
+      value VARCHAR(45) NULL,
+      total VARCHAR(45) NULL,
+      PRIMARY KEY (id, vworders_id))
+      $charset_collate;";
+    dbDelta($sql);
+
+    add_option('vworders_db_version', $this->vworders_db_version);
   }
 
   public function vworders_uninstall(){
@@ -134,46 +142,68 @@ class VW_Orders {
       wp_die();
     }
 
-    $table_name = $wpdb->prefix . 'vworders';
-    $orderDate = explode('/', $data['order-date']);
-    $dataArr = array(
-      'vworders_order'          => $data['order-number'],
-      'vworders_date'           => $orderDate[2] . '-' . $orderDate[1] . '-' . $orderDate[0],
-      'vworders_client'         => $data['order-client'],
-      'vworders_cpf_cnpj'       => $data['order-cpf-cnpj'],
-      'vworders_zip'            => $data['order-zip'],
-      'vworders_address'        => $data['order-address'],
-      'vworders_email'          => $data['order-email'],
-      'vworders_phone'          => $data['order-phone'],
-      'vworders_mobile'         => $data['order-mobile'],
-      'vworders_print_color'    => $data['order-print-color'],
-      'vworders_delivery_date'  => $data['order-date-delivery'],
-      'vworders_extras_costs'   => $data[''],
-      'vworders_delivery_price' => $data['order-frete-value'],
-      'vworders_total'          => $data['order-total'],
-      'vworders_payment_days'   => $data['order-days-payment'],
-      ## order-date-payment
-      'vworders_payment_method' => $data['order-payment-method'],
-      'vworders_payment_value'  => $data['order-payment-value'],
-      'vworders_obs'            => $data['order-payment-notes']
-    );
-    $wpdb->insert($table_name, $dataArr);
+    $table_data = $wpdb->prefix . 'vworders';
+    $table_type = $wpdb->prefix . 'vworders_item';
+    $table_payments = $wpdb->prefix . 'vworders_payment';
 
-    $productArr = array();
-    $finalProductArr = array();
-    foreach($finalArr as $key => $value){
-      if(strpos($key, 'order-type') !== false){
-        $productArr[$key] = $value;
+    $data = $_POST['data'];
+    $orderDate = explode('/', $data['order-date']);
+    $orderDelivery = explode('/', $data['order-date-delivery']);
+    $dataArr = array(
+      'id'                  => null,
+      'order_number'        => $data['order-number'],
+      'order_date'          => $orderDate[2] . '-' . $orderDate[1] . '-' . $orderDate[0],
+      'order_client'        => $data['order-client'],
+      'order_cpf_cnpj'      => $data['order-cpf-cnpj'],
+      'order_zip'           => $data['order-zip'],
+      'order_address'       => $data['order-address'],
+      'order_email'         => $data['order-email'],
+      'order_phone'         => $data['order-phone'],
+      'order_mobile'        => $data['order-mobile'],
+      'order_total'         => $data['order-total'],
+      'order_print_color'   => $data['order-print-color'],
+      'order_date_delivery' => $orderDelivery[2] . '-' . $orderDelivery[1] . '-' . $orderDelivery[0],
+      'order_delivery_name' => $data['order-delivery-name'],
+      'order_delivery_type' => $data['order-delivery-type'],
+      'order_payment_notes' => $data['order-payment-notes']
+    );
+    $wpdb->insert($table_data, $dataArr);
+    if($wpdb->last_error !== ''){
+        // $wpdb->print_error();
+        status_header(400);
+        $str = htmlspecialchars( $wpdb->last_result, ENT_QUOTES ) . ' // // // ' . htmlspecialchars( $wpdb->last_query, ENT_QUOTES );
+        print_r(json_encode(array('response' => $str)));
+        wp_die();
+    }
+    $id = $wpdb->insert_id;
+
+    foreach($data['order-type'] as $type){
+      $typeArr = $type;
+      $typeArr['vworders_id'] = $id;
+      $wpdb->insert($table_type, $typeArr);
+      if($wpdb->last_error !== ''){
+          // $wpdb->print_error();
+          status_header(400);
+          $str = htmlspecialchars( $wpdb->last_result, ENT_QUOTES ) . ' // // // ' . htmlspecialchars( $wpdb->last_query, ENT_QUOTES );
+          print_r(json_encode(array('response' => $str)));
+          wp_die();
       }
     }
-    $i = 0;
-    foreach($productArr as $key => $value){
-      for($j=0;$j<5;$j++){
-         array_push($finalProductArr[$i], array($key => $value));
+    foreach($data['order-payment'] as $payment){
+      $paymentArr = $payment;
+      $paymentArr['vworders_id'] = $id;
+      $wpdb->insert($table_payments, $paymentArr);
+      if($wpdb->last_error !== ''){
+          // $wpdb->print_error();
+          status_header(400);
+          $str = htmlspecialchars( $wpdb->last_result, ENT_QUOTES ) . ' // // // ' . htmlspecialchars( $wpdb->last_query, ENT_QUOTES );
+          print_r(json_encode(array('response' => $str)));
+          wp_die();
       }
-      $i++;
     }
-    print_r($finalProductArr);
+
+    echo json_encode(array('response' => 'Pedido cadastrado com sucesso!'));
+    $wpdb->flush();
     wp_die();
   }
 

@@ -1,5 +1,6 @@
 <div class="container-fluid">
   <h1 class="text-info">Pedidos</h1>
+  <div id="alert"></div>
   <form class="form-horizontal" name="save-order" enctype="application/x-www-form-urlencoded" method="post">
     <div class="form-group">
       <label for="order-number" class="col-sm-2 control-label">Número de Venda:</label>
@@ -236,7 +237,7 @@
     <div class="form-group">
       <label for="order-payment-notes" class="col-sm-2 control-label">Observações:</label>
       <div class="col-sm-5">
-        <textarea class="form-control" name="order-payment-notes" rows="3">WhatsApp (21) 9703­9-9948 ­ www.querocopo.com.br</textarea>
+        <textarea class="form-control" name="order-payment-notes" rows="3">WhatsApp (21) 97039-9948 www.querocopo.com.br</textarea>
       </div>
     </div>
     <div class="form-group">
