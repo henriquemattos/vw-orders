@@ -25,12 +25,15 @@
       <?php foreach($results as $row) : ?>
         <tr>
           <td><?php echo $row->id; ?></td>
-          <td><?php echo $row->order_number; ?></td>
+          <td><a href="<?php menu_page_url('vw-orders-create'); ?>&order=<?php echo $row->id; ?>"><?php echo $row->order_number; ?></a></td>
           <td><?php echo $row->order_date; ?></td>
           <td><?php echo $row->order_client; ?></td>
           <td><?php echo $row->order_cpf_cnpj; ?></td>
           <td><?php echo $row->order_total; ?></td>
-          <td class="text-center"><button class="btn btn-sm btn-primary"><i class="glyphicon glyphicon-pencil"></i></button>
+          <td class="text-center">
+            <button class="btn btn-sm btn-primary" title="Editar" data-toggle="tooltip" data-placement="top"><i class="glyphicon glyphicon-pencil"></i></button>
+            <button class="btn btn-sm btn-warning" title="Imprimir PDF" data-toggle="tooltip" data-placement="top"><i class="glyphicon glyphicon-print"></i></button>
+          </td>
         </tr>
       <?php endforeach; ?>
     </tbody>

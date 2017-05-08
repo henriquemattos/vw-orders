@@ -14,9 +14,21 @@ Domain Path: /languages
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
 class VW_Orders {
+  private $wpdb;
   private $vworders_db_version = '1.0';
+  private $table_data;
+  private $table_item;
+  private $table_payments;
+  private $charset_collate;
 
   public function __construct(){
+    global $wpdb;
+    $this->wpdb            = $wpdb;
+    $this->table_data      = $wpdb->prefix . 'vworders';
+    $this->table_item      = $wpdb->prefix . 'vworders_item';
+    $this->table_payments  = $wpdb->prefix . 'vworders_payment';
+    $this->charset_collate = $wpdb->get_charset_collate();
+
     register_activation_hook( __FILE__, array($this,'vworders_install'));
     // register_deactivation_hook(__FILE__, array($this, 'vworders_uninstall'));
     // add_action('plugins_loaded', 'vworders_update_db_check');
@@ -29,15 +41,10 @@ class VW_Orders {
   }
 
   public function vworders_install(){
-    global $wpdb;
-    $tableOrders = $wpdb->prefix . 'vworders';
-    $tablePayments = $wpdb->prefix . 'vworders_payment';
-    $tableItems = $wpdb->prefix . 'vworders_item';
-    $charset_collate = $wpdb->get_charset_collate();
-
+    $wpdb = $this->wpdb;
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-    $sql = "CREATE TABLE IF NOT EXISTS $tableOrders (
+    $sql = "CREATE TABLE IF NOT EXISTS $this->table_data (
          id INT UNSIGNED NOT NULL AUTO_INCREMENT,
          order_number VARCHAR(45) NULL,
          order_date DATE NULL DEFAULT NULL,
@@ -55,10 +62,10 @@ class VW_Orders {
          order_delivery_type VARCHAR(45) NULL,
          order_payment_notes VARCHAR(45) NULL,
          PRIMARY KEY (id))
-       $charset_collate;";
+       $this->charset_collate;";
     dbDelta($sql);
 
-    $sql = "CREATE TABLE IF NOT EXISTS $tablePayments (
+    $sql = "CREATE TABLE IF NOT EXISTS $this->table_payments (
         id INT UNSIGNED NOT NULL AUTO_INCREMENT,
         vworders_id INT UNSIGNED NOT NULL,
         days VARCHAR(45) NULL,
@@ -67,10 +74,10 @@ class VW_Orders {
         value VARCHAR(45) NULL,
         notes VARCHAR(45) NULL,
         PRIMARY KEY (id, vworders_id))
-      $charset_collate;";
+      $this->charset_collate;";
     dbDelta($sql);
 
-    $sql = "CREATE TABLE IF NOT EXISTS $tableItems (
+    $sql = "CREATE TABLE IF NOT EXISTS $this->table_item (
       id INT UNSIGNED NOT NULL AUTO_INCREMENT,
       vworders_id INT UNSIGNED NOT NULL,
       item VARCHAR(45) NULL,
@@ -79,7 +86,7 @@ class VW_Orders {
       value VARCHAR(45) NULL,
       total VARCHAR(45) NULL,
       PRIMARY KEY (id, vworders_id))
-      $charset_collate;";
+      $this->charset_collate;";
     dbDelta($sql);
 
     add_option('vworders_db_version', $this->vworders_db_version);
@@ -113,7 +120,7 @@ class VW_Orders {
     add_menu_page('Pedidos', 'Pedidos','publish_posts','vw-orders.php', array($this, 'vworders_list'), 'dashicons-analytics' );
     add_submenu_page('vw-orders.php', 'Todos os Pedidos', 'Todos os Pedidos', 'publish_posts', 'vw-orders.php', array($this, 'vworders_list') );
     add_submenu_page('vw-orders.php', 'Adicionar Pedido', 'Adicionar Pedido', 'publish_posts', 'vw-orders-create', array($this, 'vworders_create') );
-    add_submenu_page('vw-orders.php', 'Gerar Relatórios', 'Gerar Relatórios', 'publish_posts', 'vw-orders-reporst', array($this, 'vworders_report') );
+    add_submenu_page('vw-orders.php', 'Gerar Relatórios', 'Gerar Relatórios', 'publish_posts', 'vw-orders-report', array($this, 'vworders_report') );
   }
 
   public function vworders_init(){
@@ -131,31 +138,26 @@ class VW_Orders {
   }
 
   public function vworders_list(){
-    global $wpdb;
-    $table_data = $wpdb->prefix . 'vworders';
-    $table_type = $wpdb->prefix . 'vworders_item';
-    $table_payments = $wpdb->prefix . 'vworders_payment';
-    $query = "SELECT * FROM {$table_data} ORDER BY order_date DESC";
-    $results = $wpdb->get_results($query, OBJECT);
+    $query = "SELECT * FROM {$this->table_data} ORDER BY order_date DESC";
+    $results = $this->wpdb->get_results($query, OBJECT);
     include_once 'template-vworders-list.php';
   }
 
   public function vworders_create(){
+    if(isset($_GET) && isset($_GET['order'])){
+      $query = "SELECT * FROM {$this->table_data} WHERE id = {$_GET['order']}";
+      $result = $this->wpdb->get_results($query, OBJECT);
+    }
     include_once 'template-vworders-create.php';
   }
 
   public function save(){
-    global $wpdb;
     ob_clean();
 
     if(!isset($_POST['data'])){
       echo 'You must POST some data to this action';
       wp_die();
     }
-
-    $table_data = $wpdb->prefix . 'vworders';
-    $table_type = $wpdb->prefix . 'vworders_item';
-    $table_payments = $wpdb->prefix . 'vworders_payment';
 
     $data = $_POST['data'];
     $orderDate = explode('/', $data['order-date']);
@@ -178,24 +180,24 @@ class VW_Orders {
       'order_delivery_type' => $data['order-delivery-type'],
       'order_payment_notes' => $data['order-payment-notes']
     );
-    $wpdb->insert($table_data, $dataArr);
-    if($wpdb->last_error !== ''){
+    $wpdb->insert($this->table_data, $dataArr);
+    if($this->wpdb->last_error !== ''){
         // $wpdb->print_error();
         status_header(400);
-        $str = htmlspecialchars( $wpdb->last_result, ENT_QUOTES ) . ' // // // ' . htmlspecialchars( $wpdb->last_query, ENT_QUOTES );
+        $str = htmlspecialchars($this->wpdb->last_result, ENT_QUOTES) . ' // // // ' . htmlspecialchars($this->wpdb->last_query, ENT_QUOTES);
         print_r(json_encode(array('response' => $str)));
         wp_die();
     }
-    $id = $wpdb->insert_id;
+    $id = $this->wpdb->insert_id;
 
     foreach($data['order-type'] as $type){
       $typeArr = $type;
       $typeArr['vworders_id'] = $id;
-      $wpdb->insert($table_type, $typeArr);
-      if($wpdb->last_error !== ''){
+      $this->wpdb->insert($this->table_item, $typeArr);
+      if($this->wpdb->last_error !== ''){
           // $wpdb->print_error();
           status_header(400);
-          $str = htmlspecialchars( $wpdb->last_result, ENT_QUOTES ) . ' // // // ' . htmlspecialchars( $wpdb->last_query, ENT_QUOTES );
+          $str = htmlspecialchars($this->wpdb->last_result, ENT_QUOTES ) . ' // // // ' . htmlspecialchars($this->wpdb->last_query, ENT_QUOTES);
           print_r(json_encode(array('response' => $str)));
           wp_die();
       }
@@ -203,23 +205,26 @@ class VW_Orders {
     foreach($data['order-payment'] as $payment){
       $paymentArr = $payment;
       $paymentArr['vworders_id'] = $id;
-      $wpdb->insert($table_payments, $paymentArr);
-      if($wpdb->last_error !== ''){
+      $this->wpdb->insert($this->table_payments, $paymentArr);
+      if($this->wpdb->last_error !== ''){
           // $wpdb->print_error();
           status_header(400);
-          $str = htmlspecialchars( $wpdb->last_result, ENT_QUOTES ) . ' // // // ' . htmlspecialchars( $wpdb->last_query, ENT_QUOTES );
+          $str = htmlspecialchars($this->wpdb->last_result, ENT_QUOTES) . ' // // // ' . htmlspecialchars($this->wpdb->last_query, ENT_QUOTES);
           print_r(json_encode(array('response' => $str)));
           wp_die();
       }
     }
 
     echo json_encode(array('response' => 'Pedido cadastrado com sucesso!'));
-    $wpdb->flush();
+    $this->wpdb->flush();
     wp_die();
   }
 
   public function vworders_report(){
-
+    include_once 'template-vworders-report.php';
+  }
+  public function vworders_update(){
+    include_once 'template-vworders-update.php';
   }
 }
 

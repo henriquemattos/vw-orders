@@ -5,55 +5,56 @@
     <div class="form-group">
       <label for="order-number" class="col-sm-2 control-label">Número de Venda:</label>
       <div class="col-sm-3">
-        <input type="number" name="order-number" class="form-control" id="order-number" value="1" min="000000001" max="999999999">
+        <input type="number" name="order-number" class="form-control" id="order-number" value="<?php echo ($result[0]->order_number ?: '1'); ?>" min="1" max="999999999">
       </div>
     </div>
     <div class="form-group">
       <label for="order-date" class="col-sm-2 control-label">Data:</label>
       <div class="col-sm-2">
-        <input type="date" name="order-date" class="form-control input-date" id="order-date" value="<?php echo date('d/m/Y'); ?>">
+
+        <input type="date" name="order-date" class="form-control input-date" id="order-date" value="<?php echo ($result[0]->order_date ? date('d/m/Y', strtotime($result[0]->order_date)) : date('d/m/Y')); ?>">
       </div>
     </div>
     <div class="form-group">
       <label for="order-client" class="col-sm-2 control-label">Cliente:</label>
       <div class="col-sm-4">
-        <input type="text" name="order-client" class="form-control" id="order-client" placeholder="Cliente">
+        <input type="text" name="order-client" class="form-control" id="order-client" placeholder="Cliente" value="<?php echo ($result[0]->order_client ?: ''); ?>">
       </div>
     </div>
     <div class="form-group">
       <label for="order-cpf-cnpj" class="col-sm-2 control-label">CPF/CNPJ:</label>
       <div class="col-sm-2">
-        <input type="text" name="order-cpf-cnpj" class="form-control" id="order-cpf-cnpj">
+        <input type="text" name="order-cpf-cnpj" class="form-control" id="order-cpf-cnpj" value="<?php echo ($result[0]->order_cpf_cnpj ?: ''); ?>">
       </div>
     </div>
     <div class="form-group">
       <label for="order-zip" class="col-sm-2 control-label">CEP:</label>
       <div class="col-sm-2">
-        <input type="text" name="order-zip" class="form-control" id="order-zip" maxlength="9" placeholder="22000-222">
+        <input type="text" name="order-zip" class="form-control" id="order-zip" maxlength="9" placeholder="22000-222" value="<?php echo ($result[0]->order_zip ?: ''); ?>">
       </div>
     </div>
     <div class="form-group">
       <label for="order-address" class="col-sm-2 control-label">Endereço Completo:</label>
       <div class="col-sm-6">
-        <input type="text" name="order-address" class="form-control" id="order-address" placeholder="Av. Paranapuã, 262, A, Ilha do Governador, Rio de Janeiro - RJ">
+        <input type="text" name="order-address" class="form-control" id="order-address" placeholder="Av. Paranapuã, 262, A, Ilha do Governador, Rio de Janeiro - RJ" value="<?php echo ($result[0]->order_address ?: ''); ?>">
       </div>
     </div>
     <div class="form-group">
       <label for="order-email" class="col-sm-2 control-label">E-mail:</label>
       <div class="col-sm-4">
-        <input type="email" name="order-email" class="form-control" id="order-email" placeholder="email@dominio.com.br">
+        <input type="email" name="order-email" class="form-control" id="order-email" placeholder="email@dominio.com.br" value="<?php echo ($result[0]->order_email ?: ''); ?>">
       </div>
     </div>
     <div class="form-group">
       <label for="order-phone" class="col-sm-2 control-label">Telefone:</label>
       <div class="col-sm-2">
-        <input type="text" name="order-phone" class="form-control" id="order-phone" placeholder="(21) 2200-0022">
+        <input type="text" name="order-phone" class="form-control" id="order-phone" placeholder="(21) 2200-0022" value="<?php echo ($result[0]->order_phone ?: ''); ?>">
       </div>
     </div>
     <div class="form-group">
       <label for="order-mobile" class="col-sm-2 control-label">Celular:</label>
       <div class="col-sm-2">
-        <input type="text" name="order-mobile" class="form-control" id="order-mobile" placeholder="(21) 98800-0088">
+        <input type="text" name="order-mobile" class="form-control" id="order-mobile" placeholder="(21) 98800-0088" value="<?php echo ($result[0]->order_mobile ?: ''); ?>">
       </div>
     </div>
     <div class="table-responsive">
@@ -213,36 +214,36 @@
     <div class="form-group">
       <label for="order-print-color" class="col-sm-2 control-label">Cor da Impressão:</label>
       <div class="col-sm-4">
-        <input type="text" class="form-control" id="order-print-color" name="order-print-color">
+        <input type="text" class="form-control" id="order-print-color" name="order-print-color" value="<?php echo ($result[0]->order_print_color ?: ''); ?>">
       </div>
     </div>
     <div class="form-group">
       <label for="order-date-delivery" class="col-sm-2 control-label">Data da Entrega:</label>
       <div class="col-sm-2">
-        <input type="date" class="form-control input-date" id="order-date-delivery" name="order-date-delivery" value="<?php echo date('d/m/Y',  time() + (86400 * 2)); ?>">
+        <input type="date" class="form-control input-date" id="order-date-delivery" name="order-date-delivery" value="<?php echo ($result[0]->order_date_delivery ? date('d/m/Y', strtotime($result[0]->order_date_delivery)) : date('d/m/Y',  time() + (86400 * 2))); ?>">
       </div>
     </div>
     <div class="form-group">
       <label for="order-print-color" class="col-sm-2 control-label">Transportador:</label>
       <div class="col-sm-4">
-        <input type="text" class="form-control" name="order-delivery-name">
+        <input type="text" class="form-control" name="order-delivery-name" value="<?php echo ($result[0]->order_delivery_name ?: ''); ?>">
       </div>
     </div>
     <div class="form-group">
       <label for="order-print-color" class="col-sm-2 control-label">Modalidade:</label>
       <div class="col-sm-4">
-        <input type="text" class="form-control" name="order-delivery-type">
+        <input type="text" class="form-control" name="order-delivery-type" value="<?php echo ($result[0]->order_delivery_type ?: ''); ?>">
       </div>
     </div>
     <div class="form-group">
       <label for="order-payment-notes" class="col-sm-2 control-label">Observações:</label>
       <div class="col-sm-5">
-        <textarea class="form-control" name="order-payment-notes" rows="3">WhatsApp (21) 97039-9948 www.querocopo.com.br</textarea>
+        <textarea class="form-control" name="order-payment-notes" rows="3"><?php echo ($result[0]->order_payment_notes ?: 'WhatsApp (21) 97039-9948 www.querocopo.com.br'); ?></textarea>
       </div>
     </div>
     <div class="form-group">
       <div class="col-sm-offset-2 col-sm-10">
-        <button type="submit" class="btn btn-success">Cadastrar Pedido</button>
+        <button type="submit" class="btn btn-success"><?php echo ($result[0]->order_id ? 'Atualizar' : 'Cadastrar'); ?> Pedido</button>
       </div>
     </div>
   </form>
